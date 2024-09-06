@@ -1,8 +1,16 @@
-import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  UnauthorizedException,
+  UsePipes,
+} from '@nestjs/common'
 import { z } from 'zod'
 import { ZodValidationPipe } from '../pipes/zod-validation-pipe'
 import { AuthenticateStudentUseCase } from '@/domain/forum/application/use-cases/authenticate-student'
+import { WrongCredetialsError } from '@/domain/forum/application/use-cases/errors/wrong-credentials-error'
 
 const authenticateBodySchema = z.object({
   email: z.string().email(),
@@ -13,10 +21,7 @@ type AuthenticateBodySchema = z.infer<typeof authenticateBodySchema>
 
 @Controller('/sessions')
 export class AuthenticateController {
-  constructor(
-    private authenticateStudent: AuthenticateStudentUseCase,
-    private jwt: JwtService,
-  ) {}
+  constructor(private authenticateStudent: AuthenticateStudentUseCase) {}
 
   @Post()
   @HttpCode(201)
@@ -27,7 +32,14 @@ export class AuthenticateController {
     const result = await this.authenticateStudent.execute({ email, password })
 
     if (result.isLeft()) {
-      throw new Error()
+      const error = result.value
+
+      switch (error.constructor) {
+        case WrongCredetialsError:
+          throw new UnauthorizedException(error.message)
+        default:
+          throw new BadRequestException(error.message)
+      }
     }
 
     const { accessToken } = result.value
