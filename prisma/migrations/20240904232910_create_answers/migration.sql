@@ -1,14 +1,14 @@
 /*
   Warnings:
 
-  - A unique constraint covering the columns `[best_answer_Id]` on the table `questions` will be added. If there are existing duplicate values, this will fail.
+  - A unique constraint covering the columns `[best_answer_id]` on the table `questions` will be added. If there are existing duplicate values, this will fail.
 
 */
 -- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('STUDENT', 'INSTRUCTOR');
 
 -- AlterTable
-ALTER TABLE "questions" ADD COLUMN     "best_answer_Id" TEXT;
+ALTER TABLE "questions" ADD COLUMN     "best_answer_id" TEXT;
 
 -- AlterTable
 ALTER TABLE "users" ADD COLUMN     "role" "UserRole" NOT NULL DEFAULT 'STUDENT';
@@ -26,10 +26,10 @@ CREATE TABLE "answers" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "questions_best_answer_Id_key" ON "questions"("best_answer_Id");
+CREATE UNIQUE INDEX "questions_best_answer_id_key" ON "questions"("best_answer_id");
 
 -- AddForeignKey
-ALTER TABLE "questions" ADD CONSTRAINT "questions_best_answer_Id_fkey" FOREIGN KEY ("best_answer_Id") REFERENCES "answers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "questions" ADD CONSTRAINT "questions_best_answer_id_fkey" FOREIGN KEY ("best_answer_id") REFERENCES "answers"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "answers" ADD CONSTRAINT "answers_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
